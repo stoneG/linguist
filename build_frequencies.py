@@ -1,3 +1,4 @@
+import re
 import string
 import time
 import os
@@ -10,10 +11,10 @@ class OfficialWords(object):
         OWL.close()
         self.dict = dict(zip(self.list,[0]*len(self.list)))
 
-    def increment(self, word):
+    def update(self, word, freq):
         """Increments word in self.dict if it exists."""
         try:
-            self.dict[word] += 1
+            self.dict[word] = freq
         except KeyError:
             pass
 
@@ -31,12 +32,12 @@ class TextCorpus(object):
     def build(self):
         for index, name in enumerate(self.file_names):
             text = Text(name)
-            for word in text.get_words():
+            for word, count in text.get_word_and_count():
                 if len(word) <= 4:
                     continue
                 else:
-                    self.OWL.increment(word)
-            print index, 'files built'
+                    self.OWL.update(word, int(count))
+            print index+1, 'files built'
         return(self.OWL.dict)
 
     def parent_directory(self):
@@ -45,28 +46,27 @@ class TextCorpus(object):
 
 class Text(object):
 
-    word_pattern = re.compile(ur'\[\[([\w])\]\]\s+\|\|\s+(\d+)')
 
     def __init__(self, file_name):
         f = open(file_name, 'r')
         self.string = f.read()
+        self.word_pat = re.compile(ur'\[\[([\w]+)\]\]\s+\|\|\s+(\d+)')
         f.close()
 
-    def get_words(self):
-        trans = string.maketrans('','')
-        to_remove = string.punctuation + string.digits
-        self.string = self.string.translate(trans, to_remove)
-        return self.string.lower().split()
+    def get_word_and_count(self):
+        """Return a tuple of word and that word's count."""
+        match = re.findall(self.word_pat, self.string)
+        return match
 
 
 def current_time():
     return time.time()
 
 OWLpath = 'wordlist/TWL06.txt'
-textFolder = 'text_corpus'
+textFolder = 'abc'
 dic = {}
 def main():
-    global the_dict
+    global dic
     t = current_time()
     text_corpus = TextCorpus(textFolder, OWLpath)
     dic = text_corpus.build()
