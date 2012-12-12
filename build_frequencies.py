@@ -17,10 +17,8 @@ class OfficialWords(object):
 
     def update(self, word, freq):
         """Increments word in self.dict if it exists."""
-        try:
+        if word in self.dict:
             self.dict[word] = freq
-        except KeyError:
-            pass
 
 # Construct word counts for OWL words
 # os.listdir('.') for cwd files
@@ -73,7 +71,7 @@ class Database(object):
 
     def create_cursor(self):
         name_and_user = "dbname={0} user={1}".format(self.name, self.user)
-        self.conn = psycopg2.connection(name_and_user)
+        self.conn = psycopg2.connect(name_and_user)
         self.cur = self.conn.cursor()
 
     def commit_and_close(self):
@@ -95,11 +93,11 @@ class Database(object):
 
 OWLpath = 'wordlist/TWL06.txt'
 textFolder = 'abc'
-dic = {}
 def main():
-    global dic
     text_corpus = TextCorpus(textFolder, OWLpath)
-    dic = text_corpus.build()
+    wc_dict = text_corpus.build()
+    db = Database('linguist', 'sitong', wc_dict)
+    db.create_table()
 
 if __name__ == '__main__':
     main()
