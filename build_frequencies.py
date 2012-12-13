@@ -4,6 +4,7 @@ import time
 import os
 
 import psycopg2
+from db import Database
 
 # Database: linguist
 
@@ -58,37 +59,6 @@ class Text(object):
         match = re.findall(self.word_pat, self.string)
         return match
 
-class Database(object):
-    def __init__(self, dbName, dbUser, wordCount):
-        """Param : Description
-        dbName   : Str name of the database to connect to
-        dbUser   : Str name of the psql user
-        wordCount: Dict of word counts
-        """
-        self.name = dbName
-        self.user = dbUser
-        self.word_count = wordCount
-
-    def create_cursor(self):
-        name_and_user = "dbname={0} user={1}".format(self.name, self.user)
-        self.conn = psycopg2.connect(name_and_user)
-        self.cur = self.conn.cursor()
-
-    def commit_and_close(self):
-        self.conn.commit()
-        self.cur.close()
-        self.conn.close()
-
-    def create_table(self):
-        """Create WordCount table in database."""
-        name = 'WordCount'
-        self.create_cursor()
-        sql = 'CREATE TABLE {0} (word varchar PRIMARY KEY, count integer);'.format(name)
-        self.cur.execute(sql)
-        for word, count in self.word_count.items():
-            sql = 'INSERT INTO {0} (word, count) VALUES (%s, %s);'.format(name)
-            self.cur.execute(sql, (word, count))
-        self.commit_and_close()
 
 
 OWLpath = 'wordlist/TWL06.txt'
@@ -97,7 +67,7 @@ def main():
     text_corpus = TextCorpus(textFolder, OWLpath)
     wc_dict = text_corpus.build()
     db = Database('linguist', 'sitong', wc_dict)
-    db.create_table()
+    db.create_table('WordCount')
 
 if __name__ == '__main__':
     main()
