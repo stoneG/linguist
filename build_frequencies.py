@@ -60,13 +60,15 @@ class Text(object):
 OWLpath = 'wordlist/TWL06.txt'
 textFolder = 'abc'
 wc_dict = {}
-def main():
+def main(returnTable=False):
     global wc_dict
     text_corpus = TextCorpus(textFolder, OWLpath)
     wc_dict = text_corpus.build()
     WordCount = WordCountTable('linguist', 'sitong', wc_dict)
     WordCount.create('WordCount', ['word', 'varchar', 'count', 'integer'])
     WordCount.populate()
+    if returnTable:
+        return WordCount
 
 if __name__ == '__main__':
     main()

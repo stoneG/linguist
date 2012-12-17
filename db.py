@@ -72,9 +72,6 @@ class WordCountTable(Database):
         self.commit_and_close()
 
     def get_count(self, word):
-        if not self.populated:
-            print 'Populate table first please'
-            raise DBError
         self.create_cursor()
         sql = 'SELECT count FROM {0} WHERE word = (%s)'.format(self.table_name)
         try:
@@ -82,6 +79,7 @@ class WordCountTable(Database):
         except:
             print "Could not access {0} in {1}.".format(word, self.table_name)
         count = self.cur.fetchone()[0]
+        self.commit_and_close()
         return count
 
 
