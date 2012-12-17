@@ -7,7 +7,7 @@ class Database(object):
         dbUser   : Str name of the psql user
         wordCount: Dict of word counts
         """
-        self.name = dbName
+        self.db_name = dbName
         self.user = dbUser
 
     def create_cursor(self):
@@ -20,7 +20,7 @@ class Database(object):
         self.cur.close()
         self.conn.close()
 
-    def create_table(self, tblName, colAndType):
+    def create(self, tblName, colAndType):
         """Create table in database.
         parameter  : description
         tblName    : str name of table to create
@@ -39,6 +39,7 @@ class Database(object):
             print 'Table could not be created'
             print 'Statement was:\n{0}'.format(sql)
             raise DBError
+        self.table_name = tblName
         self.commit_and_close()
 
 
@@ -46,8 +47,9 @@ class WordCountTable(Database):
     def __init__(self, dbName, dbUser, wordCount):
         Database.__init__(self, dbName, dbUser)
         self.word_count = wordCount
+        self.populated = False
 
-    def populate_table(self):
+    def populate(self):
         self.create_cursor()
         for word, count in self.word_count.items():
             sql = 'INSERT INTO WordCount (word, count) VALUES (%s, %s);'
@@ -56,6 +58,7 @@ class WordCountTable(Database):
             except:
                 print 'Could not insert {0}'.format(word)
                 return
+        self.populated = True
         self.commit_and_close()
 
     def increment_word(self, word):
@@ -66,6 +69,19 @@ class WordCountTable(Database):
         except:
             print "Could not add 1 to {0}'s count".format(word)
         self.commit_and_close()
+
+    def get_count(self, word):
+        if not self.populated:
+            print 'Populate table first please'
+            return
+        self.create_cursor()
+        sql = 'SELECT count FROM {0} WHERE word = (%s)'.format(name)
+        try:
+            self.cur.execute(sql, (word,))
+        except:
+            print "Could not access {0} in {1}.".format(word, self.table_name)
+        count = self.cur.fetchone()[0]
+        return count
 
 
 class UserTable(Database):
