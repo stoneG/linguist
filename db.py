@@ -1,6 +1,7 @@
+import psycopg2
 
 class Database(object):
-    def __init__(self, dbName, dbUser, wordCount):
+    def __init__(self, dbName, dbUser):
         """Param : Description
         dbName   : Str name of the database to connect to
         dbUser   : Str name of the psql user
@@ -8,7 +9,6 @@ class Database(object):
         """
         self.name = dbName
         self.user = dbUser
-        self.word_count = wordCount
 
     def create_cursor(self):
         name_and_user = "dbname={0} user={1}".format(self.name, self.user)
@@ -20,17 +20,37 @@ class Database(object):
         self.cur.close()
         self.conn.close()
 
-    def create_table(self, name):
-        """Create WordCount table in database."""
+    def create_table(self, tblName, colAndType):
+        """Create table in database.
+        parameter  : description
+        tblName    : str name of table to create
+        colAndType : list of col name and type, where the first entry is the primary key
+                     ie [colA_name, colA_type, colBname, colBtype, etc...]
+        """
         self.create_cursor()
-        sql = 'CREATE TABLE {0} (word varchar PRIMARY KEY, count integer);'.format(name)
+        create = 'CREATE TABLE {0} '.format(tblName)
+        structure = '({0} {1} PRIMARY KEY'.format(colAndType[:2])
+        for i in range(2, len(colAndType), 2):
+            structure += structure + ', {0} {1}'.format(colAndType[i], colAndType[i+1])
+        sql = create + structure + ');'
         try:
             self.cur.execute(sql)
         except:
             print 'Table could not be created'
-            return
+            print 'Statement was:\n{0}'.format(sql)
+            raise DBError
+        self.commit_and_close()
+
+
+class WordCountTable(Database):
+    def __init__(self, dbName, dbUser, wordCount):
+        Database.__init__(self, dbName, dbUser)
+        self.word_count = wordCount
+
+    def populate_table(self):
+        self.create_cursor()
         for word, count in self.word_count.items():
-            sql = 'INSERT INTO {0} (word, count) VALUES (%s, %s);'.format(name)
+            sql = 'INSERT INTO WordCount (word, count) VALUES (%s, %s);'
             try:
                 self.cur.execute(sql, (word, count))
             except:
@@ -38,7 +58,7 @@ class Database(object):
                 return
         self.commit_and_close()
 
-    def add_word(self, word):
+    def increment_word(self, word):
         self.create_cursor()
         sql = 'UPDATE {0} SET count = count + 1 WHERE word = (%s)'.format(name)
         try:
@@ -46,3 +66,11 @@ class Database(object):
         except:
             print "Could not add 1 to {0}'s count".format(word)
         self.commit_and_close()
+
+
+class UserTable(Database):
+    def __init__(self, dbName, dbUser, wordCount):
+        Database.__init__(self, dbName, dbUser, wordCount)
+
+
+class DBError(Exception): pass

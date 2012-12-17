@@ -3,7 +3,6 @@ import string
 import time
 import os
 
-import psycopg2
 from db import Database
 
 # Database: linguist
@@ -59,15 +58,17 @@ class Text(object):
         match = re.findall(self.word_pat, self.string)
         return match
 
-
-
 OWLpath = 'wordlist/TWL06.txt'
 textFolder = 'abc'
+wc_dict = {}
 def main():
+    global wc_dict
     text_corpus = TextCorpus(textFolder, OWLpath)
     wc_dict = text_corpus.build()
     db = Database('linguist', 'sitong', wc_dict)
-    db.create_table('WordCount')
+    word_count = db.create_table('WordCount')
+    for word, count in wc_dict.items():
+        word_count.insert_into('(word, count)', (word, count))
 
 if __name__ == '__main__':
     main()
