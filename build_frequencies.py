@@ -1,9 +1,8 @@
 import re
-import string
 import time
 import os
 
-from db import Database
+from db import *
 
 # Database: linguist
 
@@ -65,10 +64,9 @@ def main():
     global wc_dict
     text_corpus = TextCorpus(textFolder, OWLpath)
     wc_dict = text_corpus.build()
-    db = Database('linguist', 'sitong', wc_dict)
-    word_count = db.create_table('WordCount')
-    for word, count in wc_dict.items():
-        word_count.insert_into('(word, count)', (word, count))
+    WordCount = WordCountTable('linguist', 'sitong', wc_dict)
+    WordCount.create('WordCount', ['word', 'varchar', 'count', 'integer'])
+    WordCount.populate()
 
 if __name__ == '__main__':
     main()

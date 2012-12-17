@@ -1,3 +1,4 @@
+import pdb
 import psycopg2
 
 class Database(object):
@@ -11,7 +12,7 @@ class Database(object):
         self.user = dbUser
 
     def create_cursor(self):
-        name_and_user = "dbname={0} user={1}".format(self.name, self.user)
+        name_and_user = "dbname={0} user={1}".format(self.db_name, self.user)
         self.conn = psycopg2.connect(name_and_user)
         self.cur = self.conn.cursor()
 
@@ -29,9 +30,9 @@ class Database(object):
         """
         self.create_cursor()
         create = 'CREATE TABLE {0} '.format(tblName)
-        structure = '({0} {1} PRIMARY KEY'.format(colAndType[:2])
+        structure = '({0} {1} PRIMARY KEY'.format(colAndType[0], colAndType[1])
         for i in range(2, len(colAndType), 2):
-            structure += structure + ', {0} {1}'.format(colAndType[i], colAndType[i+1])
+            structure += ', {0} {1}'.format(colAndType[i], colAndType[i+1])
         sql = create + structure + ');'
         try:
             self.cur.execute(sql)
@@ -63,7 +64,7 @@ class WordCountTable(Database):
 
     def increment_word(self, word):
         self.create_cursor()
-        sql = 'UPDATE {0} SET count = count + 1 WHERE word = (%s)'.format(name)
+        sql = 'UPDATE {0} SET count = count + 1 WHERE word = (%s)'.format(self.table_name)
         try:
             self.cur.execute(sql, (word,))
         except:
@@ -73,9 +74,9 @@ class WordCountTable(Database):
     def get_count(self, word):
         if not self.populated:
             print 'Populate table first please'
-            return
+            raise DBError
         self.create_cursor()
-        sql = 'SELECT count FROM {0} WHERE word = (%s)'.format(name)
+        sql = 'SELECT count FROM {0} WHERE word = (%s)'.format(self.table_name)
         try:
             self.cur.execute(sql, (word,))
         except:
