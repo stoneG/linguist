@@ -45,10 +45,11 @@ class Database(object):
 
 
 class WordCountTable(Database):
-    def __init__(self, dbName, dbUser, wordCount):
+    def __init__(self, dbName, dbUser, wordCount={}, tblName=None):
         Database.__init__(self, dbName, dbUser)
         self.word_count = wordCount
-        self.populated = False
+        if tblName:
+            self.table_name = tblName
 
     def populate(self):
         self.create_cursor()
@@ -59,12 +60,11 @@ class WordCountTable(Database):
             except:
                 print 'Could not insert {0}'.format(word)
                 return
-        self.populated = True
         self.commit_and_close()
 
     def increment_word(self, word):
         self.create_cursor()
-        sql = 'UPDATE {0} SET count = count + 1 WHERE word = (%s)'.format(self.table_name)
+        sql = 'UPDATE {0} SET count = count + 1 WHERE word = (%s);'.format(self.table_name)
         try:
             self.cur.execute(sql, (word,))
         except:
@@ -73,19 +73,41 @@ class WordCountTable(Database):
 
     def get_count(self, word):
         self.create_cursor()
-        sql = 'SELECT count FROM {0} WHERE word = (%s)'.format(self.table_name)
+        sql = 'SELECT count FROM {0} WHERE word = (%s);'.format(self.table_name)
         try:
             self.cur.execute(sql, (word,))
         except:
             print "Could not access {0} in {1}.".format(word, self.table_name)
-        count = self.cur.fetchone()[0]
+        try:
+            count = self.cur.fetchone()[0]
+        except TypeError: # Word doesn't exist in table
+            return
         self.commit_and_close()
         return count
 
 
 class UserTable(Database):
-    def __init__(self, dbName, dbUser, wordCount):
-        Database.__init__(self, dbName, dbUser, wordCount)
+    def __init__(self, dbName, dbUser, tableName):
+        Database.__init__(self, dbName, dbUser)
+        self.table = tableName
+
+    def register(self, username, password):
+        error = None
+        self.create_cursor()
+        sql = 'SELECT password FROM {0} WHERE username = (%s);'.format(self.table)
+        try:
+            self.cur.execute(sql, (username,))
+        except:
+            print "Couldn't access {0} from {1}.".format(username, self.table)
+        try:
+            db_pass = self.cur.fetchone()[0]
+        except TypeError:
+            sql = 'INSERT INTO {0} (username, password) VALUES (%s, %s);'.format(self.table)
+            self.cur.execute(sql, (username, password))
+            self.commit_and_close()
+        else:
+            error = 'Username already registered'
+        return error
 
 
 class DBError(Exception): pass
