@@ -8,17 +8,24 @@
 
     <body>
         <h1>Linguist</h1>
-        <h3>Login</h3>
-        {{error}}
-        <form name="input" action="/login.html" method="post">
-            Username: <input type="text" name="username">
+        {% if logged_in %}
+            <h3>You are already logged in!</h3>
+            <a href="/logout">logout</a>
             <br>
-            Password: <input type="text" name="password">
-            <br>
-            <input name="register" type="checkbox" value="true" />Check here to register.
-            <br>
-            <input type="submit" value="Submit">
-        </form>
+            <a href="#" onclick="window.history.back();return false;">back</a>
+        {% else %}
+            <h3>Login</h3>
+            {{error}}
+            <form name="input" action="/login.html" method="post">
+                Username: <input type="text" name="username">
+                <br>
+                Password: <input type="text" name="password">
+                <br>
+                <input name="register" type="checkbox" value="true" />Check here to register.
+                <br>
+                <input type="submit" value="Submit">
+            </form>
+        {% endif %}
     </body>
 
 </html>

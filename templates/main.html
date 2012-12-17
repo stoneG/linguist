@@ -14,7 +14,11 @@
         </form>
         <br>
         <br>
-        <a href="login.html">login/register here</a>
+        {% if not username %}
+            <a href="login.html">login/register here</a>
+        {% else %}
+            Welcome back {{username}}.
+        {% endif %}
     </body>
 
 </html>
