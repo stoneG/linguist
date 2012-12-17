@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+        <!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">-->
+        <title>Linguist</title>
+    </head>
+
+    <body>
+        <h1>Linguist</h1>
+        <h3>Login</h3>
+        {{error}}
+        <form name="input" action="/login.html" method="post">
+            Username: <input type="text" name="username">
+            <br>
+            Password: <input type="text" name="password">
+            <br>
+            <input name="register" type="checkbox" value="true" />Check here to register.
+            <br>
+            <input type="submit" value="Submit">
+        </form>
+    </body>
+
+</html>
+
