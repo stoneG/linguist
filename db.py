@@ -1,5 +1,6 @@
 import pdb
 import psycopg2
+import bcrypt
 
 class Database(object):
     def __init__(self, dbName, dbUser):
@@ -91,14 +92,18 @@ class UserTable(Database):
         Database.__init__(self, dbName, dbUser)
         self.table = tableName
 
-    def register(self, username, password):
-        error = None
-        self.create_cursor()
+    def _check_username(self, username, password):
         sql = 'SELECT password FROM {0} WHERE username = (%s);'.format(self.table)
         try:
             self.cur.execute(sql, (username,))
         except:
             print "Couldn't access {0} from {1}.".format(username, self.table)
+
+    def register(self, username, password):
+        error = None
+        password = bcrypt.hashpw(password, bcrypt.gensalt())
+        self.create_cursor()
+        self._check_username(username, password)
         try:
             db_pass = self.cur.fetchone()[0]
         except TypeError:
@@ -107,6 +112,19 @@ class UserTable(Database):
             self.commit_and_close()
         else:
             error = 'Username already registered'
+        return error
+
+    def login(self, username, password):
+        error = None
+        self.create_cursor()
+        self._check_username(username, password)
+        try:
+            db_pass = self.cur.fetchone()[0]
+        except TypeError:
+            error = 'That username is not registered.'
+        else:
+            if db_pass != bcrypt.hashpw(password, db_pass):
+                error = 'Your password does not match the password our records.'
         return error
 
 

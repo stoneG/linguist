@@ -36,12 +36,13 @@ def login():
         return render_template('login.html', logged_in=True)
     error = ''
     registering = False
-    if 'register' in request.method:
+    if 'register' in request.form:
         registering = True
     if request.method == 'POST' and registering:
         error = Users.register(request.form['username'], request.form['password'])
         if not error:
             session['logged_in'] = True
+            session['username'] = request.form['username']
             return redirect(url_for('main'))
     elif request.method == 'POST':
         error = Users.login(request.form['username'], request.form['password'])
@@ -54,6 +55,7 @@ def login():
 @app.route('/logout')
 def logout():
     session['logged_in'] = False
+    del session['username']
     return redirect(url_for('main'))
 
 #if __name__ == '__main__':
