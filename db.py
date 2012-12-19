@@ -107,9 +107,10 @@ class UserTable(Database):
         try:
             db_pass = self.cur.fetchone()[0]
         except TypeError:
-            sql =  'INSERT INTO ' + self.tbl + ' (uname, pwd, fname, lname, email, words) '
-            sql += 'VALUES (%s, %s, %s, %s, %s, %s);'
-            self.cur.execute(sql, (username, password, fName, lName, email, ''))
+            sql =  'INSERT INTO ' + self.tbl + ' '
+            sql += '(uname, pwd, fname, lname, email, words, scores) '
+            sql += 'VALUES (%s, %s, %s, %s, %s, %s, %s);'
+            self.cur.execute(sql, (username, password, fName, lName, email, '', ''))
             self.commit_and_close()
         else:
             error = 'Username already registered'
@@ -128,8 +129,29 @@ class UserTable(Database):
                 error = 'Your password does not match the password our records.'
         return error
 
+    def add_to_word_score(self, username, word, score):
+        sql = 'SELECT words, scores FROM {0} WHERE uname = (%s);'.format(self.tbl)
+        self.create_cursor()
+        self.cur.execute(sql, (username,))
+        db_words, db_scores = self.cur.fetchone()
+        db_words, db_scores = db_words.split(), db_scores.split()
+        if word in db_words:
+            raise ReuseError
+        elif len(db_words) == 20:
+            db_words = db_words[1:].append(word)
+            db_scores = db_scores[1:].append(score)
+        else:
+            db_words.append(word)
+            db_scores.append(str(score))
+        db_words, db_scores = ' '.join(db_words), ' '.join(db_scores)
+        sql =  'UPDATE {0} '.format(self.tbl)
+        sql += 'SET words=(%s), scores=(%s) WHERE uname=(%s);'
+        self.cur.execute(sql, (db_words, db_scores, username))
+        self.commit_and_close()
+
     def get_user_info(self, username):
-        sql = 'SELECT fname, lname, email FROM {0} WHERE uname = (%s);'.format(self.tbl)
+        sql =  'SELECT fname, lname, email, words, scores '
+        sql += 'FROM {0} WHERE uname = (%s);'.format(self.tbl)
         self.create_cursor()
         self.cur.execute(sql, (username,))
         info = self.cur.fetchone()
@@ -138,3 +160,4 @@ class UserTable(Database):
 
 
 class DBError(Exception): pass
+class ReuseError(Exception): pass

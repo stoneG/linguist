@@ -34,6 +34,7 @@ def score():
     word = request.form['word']
     count = WC.get_count(word)
     score = 50
+    css = "font-size:{0}px;".format(score)
     if count:
         WC.increment_word(word)
         lookup.word = word
@@ -41,7 +42,12 @@ def score():
         defn = wordAPI.getDefinitions(lookup)[0].text
         if session['logged_in']:
             score = 100 # TODO calculate score
-        css = "font-size:{0}px;".format(score)
+            css = "font-size:{0}px;".format(score)
+            try:
+                Users.add_to_word_score(session['username'], word, score)
+            except ReuseError:
+                return render_template('score.html', word=word, size=css, score=False,
+                                       defn=defn, logged_in=True)
         return render_template('score.html', word=word, size=css, score=score, defn=defn,
                                logged_in=session['logged_in'])
     else:
@@ -85,8 +91,8 @@ def logout():
 def profile(username):
     if 'username' not in session or username != session['username']:
         return render_template('404.html')
-    fname, lname, email = Users.get_user_info(session['username'])
-    score = 100
+    fname, lname, email, words, scores = Users.get_user_info(session['username'])
+    score = 100 # TODO show cumulative score
     return render_template('profile.html', user=username, fname=fname, lname=lname,
                            email=email, score=score)
 
