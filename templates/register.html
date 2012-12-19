@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+        <!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">-->
+        <link href='http://fonts.googleapis.com/css?family=Peralta' rel='stylesheet' type='text/css'>
+        <title>Linguist</title>
+    </head>
+
+    <body>
+        <h1>Linguist</h1>
+        {% if logged_in %}
+            <h3>You are already logged in!</h3>
+            <a href="/logout">logout</a>
+            <br>
+            <a href="#" onclick="window.history.back();return false;">back</a>
+        {% else %}
+            <h3>Register</h3>
+            {{error}}
+            <form name="input" action="/register.html" method="post">
+                First Name: <input type="text" name="fName">
+                <br>
+                Last Name: <input type="text" name="lName">
+                <br>
+                Email: <input type="text" name="email">
+                <br>
+                <br>
+                Username: <input type="text" name="username">
+                <br>
+                Password: <input type="text" name="password">
+                <br>
+                <input type="submit" value="Submit">
+            </form>
+        {% endif %}
+    </body>
+
+</html>
+
