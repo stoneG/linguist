@@ -128,5 +128,13 @@ class UserTable(Database):
                 error = 'Your password does not match the password our records.'
         return error
 
+    def get_user_info(self, username):
+        sql = 'SELECT fname, lname, email FROM {0} WHERE uname = (%s)'.format(self.tbl)
+        self.create_cursor()
+        self.cur.execute(sql, (username))
+        info = self.cur.fetchone()
+        self.commit_and_close()
+        return info
+
 
 class DBError(Exception): pass

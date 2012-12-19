@@ -75,7 +75,10 @@ def logout():
 def profile(username):
     if 'username' not in session or username != session['username']:
         return render_template('404.html')
-    return render_template('profile.html', user=username)
+    fname, lname, email = Users.get_user_info(username)
+    score = 100
+    return render_template('profile.html', user=username, fname=fname, lname=lname,
+                           email=email, score=score)
 
 @app.route('/404')
 def four_oh_four():
