@@ -46,11 +46,11 @@ class Database(object):
 
 
 class WordCountTable(Database):
-    def __init__(self, dbName, dbUser, wordCount={}, tblName=None):
+    def __init__(self, dbName, dbUser, wordCount={}, tableName=None):
         Database.__init__(self, dbName, dbUser)
         self.word_count = wordCount
-        if tblName:
-            self.table_name = tblName
+        if tableName:
+            self.tbl = tableName
 
     def populate(self):
         self.create_cursor()
@@ -65,7 +65,7 @@ class WordCountTable(Database):
 
     def increment_word(self, word):
         self.create_cursor()
-        sql = 'UPDATE {0} SET count = count + 1 WHERE word = (%s);'.format(self.table_name)
+        sql = 'UPDATE {0} SET count = count + 1 WHERE word = (%s);'.format(self.tbl)
         try:
             self.cur.execute(sql, (word,))
         except:
@@ -74,11 +74,11 @@ class WordCountTable(Database):
 
     def get_count(self, word):
         self.create_cursor()
-        sql = 'SELECT count FROM {0} WHERE word = (%s);'.format(self.table_name)
+        sql = 'SELECT count FROM {0} WHERE word = (%s);'.format(self.tbl)
         try:
             self.cur.execute(sql, (word,))
         except:
-            print "Could not access {0} in {1}.".format(word, self.table_name)
+            print "Could not access {0} in {1}.".format(word, self.tbl)
         try:
             count = self.cur.fetchone()[0]
         except TypeError: # Word doesn't exist in table
@@ -90,16 +90,16 @@ class WordCountTable(Database):
 class UserTable(Database):
     def __init__(self, dbName, dbUser, tableName):
         Database.__init__(self, dbName, dbUser)
-        self.table = tableName
+        self.tbl = tableName
 
     def _check_username(self, username, password):
-        sql = 'SELECT password FROM {0} WHERE username = (%s);'.format(self.table)
+        sql = 'SELECT pwd FROM {0} WHERE uname = (%s);'.format(self.tbl)
         try:
             self.cur.execute(sql, (username,))
         except:
-            print "Couldn't access {0} from {1}.".format(username, self.table)
+            print "Couldn't access {0} from {1}.".format(username, self.tbl)
 
-    def register(self, username, password):
+    def register(self, username, password, fName, lName, email):
         error = None
         password = bcrypt.hashpw(password, bcrypt.gensalt())
         self.create_cursor()
@@ -107,8 +107,9 @@ class UserTable(Database):
         try:
             db_pass = self.cur.fetchone()[0]
         except TypeError:
-            sql = 'INSERT INTO {0} (username, password) VALUES (%s, %s);'.format(self.table)
-            self.cur.execute(sql, (username, password))
+            sql = 'INSERT INTO ' + self.tbl
+            sql += ' (uname, pwd, fname, lname, email) VALUES (%s, %s, %s, %s, %s);'
+            self.cur.execute(sql, (username, password, fName, lName, email))
             self.commit_and_close()
         else:
             error = 'Username already registered'
