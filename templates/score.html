@@ -13,8 +13,13 @@
             <h2>{{word}}</h2>
             <p>
             {% if logged_in %}
-                score: {{score}}.
-                <br>
+                {% if score %}
+                    score: {{score}}.
+                    <br>
+                {% else %}
+                    You have recently tried this word.
+                    <br>
+                {% endif %}
             {% endif %}
                 {{defn}}
                 <br>

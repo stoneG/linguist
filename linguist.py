@@ -46,8 +46,7 @@ def score():
             try:
                 Users.add_to_word_score(session['username'], word, score)
             except ReuseError:
-                return render_template('score.html', word=word, size=css, score=False,
-                                       defn=defn, logged_in=True)
+                score = False
         return render_template('score.html', word=word, size=css, score=score, defn=defn,
                                logged_in=session['logged_in'])
     else:
@@ -93,8 +92,12 @@ def profile(username):
         return render_template('404.html')
     fname, lname, email, words, scores = Users.get_user_info(session['username'])
     score = 100 # TODO show cumulative score
+    words = words.split()
+    scores = scores.split()
+    length = len(words)
     return render_template('profile.html', user=username, fname=fname, lname=lname,
-                           email=email, score=score)
+                           email=email, score=score, words=words, scores=scores,
+                           length=length)
 
 @app.route('/404')
 def four_oh_four():

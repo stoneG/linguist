@@ -12,6 +12,20 @@
         <ul>Name: {{fname}} {{lname}}</ul>
         <ul>Email: {{email}}</ul>
         <ul>Score: {{score}}</ul>
+        <table>
+            <thread>
+                <th>Words</th>
+                <th>Scores</th>
+            </thread>
+            <tbody>
+                {% for i in range(length) %}
+                    <tr>
+                        <td>{{words[i]}}</td>
+                        <td>{{scores[i]}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         <br>
         <a href="#" onclick="window.history.back();return false;">&lt;&lt; back</a>
     </body>
