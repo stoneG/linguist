@@ -3,12 +3,13 @@
 
     <head>
         <!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">-->
+        <link href='http://fonts.googleapis.com/css?family=Peralta' rel='stylesheet' type='text/css'>
         <title>Linguist</title>
     </head>
 
     <body>
         <h1>Linguist</h1>
-        <form name="input" action="/add" method="post">
+        <form name="input" action="/lookup" method="post">
             <input type="text" name="word">
             <input type="submit" value="Submit">
         </form>
@@ -17,7 +18,9 @@
         {% if not username %}
             <a href="login.html">login/register here</a>
         {% else %}
-            Welcome back {{username}}.
+        Welcome back <a href={{username_link}}>{{username}}</a>.
+            <br>
+            <a href="/logout">logout</a>
         {% endif %}
     </body>
 

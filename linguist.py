@@ -22,7 +22,8 @@ Users = UserTable('linguist', 'sitong', tableName='Users')
 @app.route('/')
 def main():
     if 'username' in session:
-        return render_template('main.html', username=session['username'])
+        return render_template('main.html', username=session['username'],
+                               username_link='/'+session['username'])
     return render_template('main.html', username=False)
 
 @app.route('/lookup', methods=['POST'])
@@ -75,7 +76,7 @@ def logout():
 def profile(username):
     if 'username' not in session or username != session['username']:
         return render_template('404.html')
-    fname, lname, email = Users.get_user_info(username)
+    fname, lname, email = Users.get_user_info(session['username'])
     score = 100
     return render_template('profile.html', user=username, fname=fname, lname=lname,
                            email=email, score=score)
