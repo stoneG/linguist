@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+        <link rel=stylesheet type=text/css href="static/score.css">
+        <link href='http://fonts.googleapis.com/css?family=Peralta' rel='stylesheet' type='text/css'>
+        <title>{{word}}</title>
+    </head>
+
+    <body>
+        <h1 style={{size}}>linguist</h1>
+        <div>
+            <h2>{{word}}</h2>
+            <p>
+            {% if logged_in %}
+                score: {{score}}.
+                <br>
+            {% endif %}
+                {{defn}}
+                <br>
+                <a href="#" onclick="window.history.back();return false;">&lt;&lt; back</a>
+            </p>
+        </div>
+    </body>
+
+</html>
+
