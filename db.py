@@ -107,9 +107,9 @@ class UserTable(Database):
         try:
             db_pass = self.cur.fetchone()[0]
         except TypeError:
-            sql = 'INSERT INTO ' + self.tbl
-            sql += ' (uname, pwd, fname, lname, email) VALUES (%s, %s, %s, %s, %s);'
-            self.cur.execute(sql, (username, password, fName, lName, email))
+            sql =  'INSERT INTO ' + self.tbl + ' (uname, pwd, fname, lname, email, words) '
+            sql += 'VALUES (%s, %s, %s, %s, %s, %s);'
+            self.cur.execute(sql, (username, password, fName, lName, email, ''))
             self.commit_and_close()
         else:
             error = 'Username already registered'

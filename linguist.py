@@ -33,14 +33,17 @@ def main():
 def score():
     word = request.form['word']
     count = WC.get_count(word)
+    score = 50
     if count:
         WC.increment_word(word)
         lookup.word = word
         lookup.limit = 1
         defn = wordAPI.getDefinitions(lookup)[0].text
-        x = 100
-        css = "font-size:{0}px;".format(x)
-        return render_template('score.html', word=word, size=css, score=x, defn=defn)
+        if session['logged_in']:
+            score = 100 # TODO calculate score
+        css = "font-size:{0}px;".format(score)
+        return render_template('score.html', word=word, size=css, score=score, defn=defn,
+                               logged_in=session['logged_in'])
     else:
         return '{0} is not in db.'.format(word)
 
