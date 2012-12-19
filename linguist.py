@@ -1,12 +1,15 @@
 from flask import Flask, render_template, request, flash, session, redirect, url_for
 import pdb
 from wordnik.api.APIClient import APIClient
+from wordnik.api.WordAPI import WordAPI
 import wordnik.model
 
 from db import *
 from wordnik_api_key import *
 
-wn = APIClient(api_key, 'http://api.wordnik.com/v4')
+client = APIClient(api_key, 'http://api.wordnik.com/v4')
+wordAPI = WordAPI(client)
+lookup = wordnik.model.WordDefinitionsInput.WordDefinitionsInput()
 
 #DATABASE = '/tmp/flaskr.db'
 DEBUG = True
@@ -32,9 +35,12 @@ def score():
     count = WC.get_count(word)
     if count:
         WC.increment_word(word)
-        css = "font-size:{0}px;".format(300)
-        x = 10
-        return render_template('score.html', word=word, size=css, score=x)
+        lookup.word = word
+        lookup.limit = 1
+        defn = wordAPI.getDefinitions(lookup)[0].text
+        x = 100
+        css = "font-size:{0}px;".format(x)
+        return render_template('score.html', word=word, size=css, score=x, defn=defn)
     else:
         return '{0} is not in db.'.format(word)
 
