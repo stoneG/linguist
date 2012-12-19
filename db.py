@@ -46,11 +46,14 @@ class Database(object):
 
 
 class WordCountTable(Database):
-    def __init__(self, dbName, dbUser, wordCount={}, tableName=None):
+    def __init__(self, dbName, dbUser, wordCount={}, tableName=None, FACTOR=280, MIN=20):
         Database.__init__(self, dbName, dbUser)
         self.word_count = wordCount
         if tableName:
             self.tbl = tableName
+        self._get_total_words()
+        self.font_size_factor = FACTOR
+        self.min_size = MIN
 
     def populate(self):
         self.create_cursor()
@@ -62,6 +65,14 @@ class WordCountTable(Database):
                 print 'Could not insert {0}'.format(word)
                 return
         self.commit_and_close()
+
+    def _get_total_words(self):
+        """Return the int count of all words in the WordCount table."""
+        self.create_cursor()
+        sql = 'SELECT count(word) FROM {0};'.format(self.tbl)
+        self.cur.execute(sql)
+        total = self.cur.fetchone()[0]
+        self.word_total = total
 
     def increment_word(self, word):
         self.create_cursor()
@@ -85,6 +96,17 @@ class WordCountTable(Database):
             return
         self.commit_and_close()
         return count
+
+    def score(self, word, count):
+        """Return the linguist score of the given word."""
+        self.create_cursor()
+        sql = 'SELECT count(word) FROM {0} WHERE count>{1}'.format(self.tbl, count)
+        self.cur.execute(sql)
+        rank = self.cur.fetchone()[0]
+        percentile = rank/float(self.word_total)
+        s = int(round(percentile*self.font_size_factor)) + self.min_size
+        self.commit_and_close()
+        return s
 
 
 class UserTable(Database):

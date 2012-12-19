@@ -35,13 +35,13 @@ def score():
     count = WC.get_count(word)
     score = 50
     css = "font-size:{0}px;".format(score)
-    if count:
+    if type(count) == type(1):
         WC.increment_word(word)
         lookup.word = word
         lookup.limit = 1
         defn = wordAPI.getDefinitions(lookup)[0].text
         if session['logged_in']:
-            score = 100 # TODO calculate score
+            score = WC.score(word, count)
             css = "font-size:{0}px;".format(score)
             try:
                 Users.add_to_word_score(session['username'], word, score)
