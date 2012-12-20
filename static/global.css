@@ -1,0 +1,28 @@
+body {
+    /*background-image: url(/static/grey.png);*/
+    color: #303030;
+}
+
+h1#linguist {
+    font-size: 100px;
+    font-family: 'Peralta', sans-serif;
+    font-weight: 400;
+    line-height: 110%;
+    margin: 0;
+    color: #FFa33f;
+}
+
+div#topbar {
+    text-align: right;
+    font-family: Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+a {
+    text-decoration: none;
+    color: #808080;
+}
+
+a:hover {
+    color: #ff7100;
+}

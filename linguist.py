@@ -33,8 +33,6 @@ def main():
 def score():
     word = request.form['word']
     count = WC.get_count(word)
-    score = 50
-    css = "font-size:{0}px;".format(score)
     if type(count) == type(1):
         WC.increment_word(word)
         lookup.word = word
@@ -42,15 +40,17 @@ def score():
         defn = wordAPI.getDefinitions(lookup)[0].text
         if session['logged_in']:
             score = WC.score(word, count)
-            css = "font-size:{0}px;".format(score)
             try:
                 Users.add_to_word_score(session['username'], word, score)
             except ReuseError:
                 score = False
+                css = "font-size:50px;"
+            else:
+                css = "font-size:{0}px;".format(score)
         return render_template('score.html', word=word, size=css, score=score, defn=defn,
                                logged_in=session['logged_in'])
     else:
-        return '{0} is not in db.'.format(word)
+        return '"{0}" is not in our database.'.format(word)
 
 @app.route('/register.html', methods=['GET', 'POST'])
 def register():

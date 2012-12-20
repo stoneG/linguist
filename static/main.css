@@ -1,0 +1,30 @@
+input {
+    padding: 9px;
+    border: solid 1px #E5E5E5;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    outline: 0;
+    font-family: Helvetica, sans-serif;
+    font-size: 50px;
+    text-align: center;
+    color: #454545;
+    width: 500px;
+    height: 50px;
+    box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+    -moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+    -webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+}
+
+input:hover {
+    box-shadow: rgba(0,0,0, 0.2) 0px 0px 8px;
+    -moz-box-shadow: rgba(0,0,0, 0.2) 0px 0px 8px;
+    -webkit-box-shadow: rgba(0,0,0, 0.2) 0px 0px 8px;
+}
+
+div#search {
+    position: relative;
+    margin: auto;
+    text-align: center;
+    top: 40%;
+}

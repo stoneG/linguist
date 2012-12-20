@@ -2,26 +2,30 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
     <head>
-        <!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">-->
-        <link href='http://fonts.googleapis.com/css?family=Peralta' rel='stylesheet' type='text/css'>
+        <link rel=stylesheet type=text/css href="/static/global.css">
+        <link rel=stylesheet type=text/css href="/static/main.css">
+        <link href='http://fonts.googleapis.com/css?family=Peralta|Josefin+Sans' rel='stylesheet' type='text/css'>
         <title>Linguist</title>
     </head>
 
     <body>
-        <h1>Linguist</h1>
-        <form name="input" action="/lookup" method="post">
-            <input type="text" name="word">
-            <input type="submit" value="Submit">
-        </form>
+        <div id="topbar">
+            {% if not username %}
+                <a href="login.html">login</a> | 
+                <a href="register.html">register</a>
+            {% else %}
+                <a href={{username_link}}>{{username}}</a> |
+                <a href="/logout">logout</a>
+            {% endif %}
+        </div>
+        <div id="search">
+            <h1 id="linguist">Linguist</h1>
+            <form autocomplete="off" name="input" action="/lookup" method="post">
+                <input type="text" name="word">
+            </form>
+        </div>
         <br>
         <br>
-        {% if not username %}
-            <a href="login.html">login/register here</a>
-        {% else %}
-        Welcome back <a href={{username_link}}>{{username}}</a>.
-            <br>
-            <a href="/logout">logout</a>
-        {% endif %}
     </body>
 
 </html>

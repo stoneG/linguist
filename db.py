@@ -51,8 +51,9 @@ class WordCountTable(Database):
         self.word_count = wordCount
         if tableName:
             self.tbl = tableName
+        self.score_zeroes = False
         self._get_total_words()
-        self.font_size_factor = FACTOR
+        self.size_factor = FACTOR
         self.min_size = MIN
 
     def populate(self):
@@ -67,9 +68,14 @@ class WordCountTable(Database):
         self.commit_and_close()
 
     def _get_total_words(self):
-        """Return the int count of all words in the WordCount table."""
+        """Return the int count of all words in the WordCount table.
+        Relies on the self.score_zeroes to determine if 0 frequency words
+        are counted."""
         self.create_cursor()
-        sql = 'SELECT count(word) FROM {0};'.format(self.tbl)
+        if self.score_zeroes:
+            sql = 'SELECT count(word) FROM {0};'.format(self.tbl)
+        else:
+            sql = 'SELECT count(word) from {0} WHERE count>0;'.format(self.tbl)
         self.cur.execute(sql)
         total = self.cur.fetchone()[0]
         self.word_total = total
@@ -104,7 +110,7 @@ class WordCountTable(Database):
         self.cur.execute(sql)
         rank = self.cur.fetchone()[0]
         percentile = rank/float(self.word_total)
-        s = int(round(percentile*self.font_size_factor)) + self.min_size
+        s = int(round(min(percentile*self.size_factor, self.size_factor))) + self.min_size
         self.commit_and_close()
         return s
 
@@ -160,11 +166,10 @@ class UserTable(Database):
         if word in db_words:
             raise ReuseError
         elif len(db_words) == 20:
-            db_words = db_words[1:].append(word)
-            db_scores = db_scores[1:].append(score)
-        else:
-            db_words.append(word)
-            db_scores.append(str(score))
+            db_words = db_words[1:]
+            db_scores = db_scores[1:]
+        db_words.append(word)
+        db_scores.append(str(score))
         db_words, db_scores = ' '.join(db_words), ' '.join(db_scores)
         sql =  'UPDATE {0} '.format(self.tbl)
         sql += 'SET words=(%s), scores=(%s) WHERE uname=(%s);'

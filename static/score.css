@@ -1,0 +1,31 @@
+h1 {
+    font-family: 'Peralta', sans-serif;
+    text-align: center;
+    font-weight: 400;
+    line-height: 1.1;
+    margin: 0;
+}
+
+div#descrip {
+    border: 1px solid #454545;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    width: 600px;
+    position: relative;
+    margin: 0 auto;
+    background-color: #f1f1f1;
+}
+
+div#word {
+    text-align: center;
+    font-family: Helvetica, sans-serif;
+}
+
+div p {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.15;
+    text-align: center;
+    margin: 0;
+}

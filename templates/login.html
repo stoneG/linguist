@@ -2,25 +2,31 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
     <head>
-        <!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">-->
-        <link href='http://fonts.googleapis.com/css?family=Peralta' rel='stylesheet' type='text/css'>
+        <link rel=stylesheet type=text/css href="/static/global.css">
+        <link rel=stylesheet type=text/css href="/static/forms.css">
+        <link href='http://fonts.googleapis.com/css?family=Peralta|Josefin+Sans' rel='stylesheet' type='text/css'>
         <title>Linguist</title>
     </head>
 
     <body>
+        <div id="topbar">
+            {% if username %}
+                <a href={{username_link}}>{{username}}</a> |
+                <a href="/logout">logout</a>
+            {% endif %}
+        </div>
         <h1>Linguist</h1>
         {% if logged_in %}
             <h3>You are already logged in!</h3>
-            <a href="/logout">logout</a>
             <br>
             <a href="#" onclick="window.history.back();return false;">back</a>
         {% else %}
             <h3>Login</h3>
             {{error}}
             <form name="input" action="/login.html" method="post">
-                Username: <input type="text" name="username">
+                Username: <input id="normal" type="text" name="username">
                 <br>
-                Password: <input type="text" name="password">
+                Password: <input id="normal" type="password" name="password">
                 <br>
                 <input type="submit" value="Submit">
             </form>
