@@ -1,5 +1,7 @@
-from flask import Flask, render_template, request, flash, session, redirect, url_for
+import os
 import pdb
+
+from flask import Flask, render_template, request, flash, session, redirect, url_for
 from wordnik.api.APIClient import APIClient
 from wordnik.api.WordAPI import WordAPI
 import wordnik.model
@@ -11,7 +13,6 @@ client = APIClient(api_key, 'http://api.wordnik.com/v4')
 wordAPI = WordAPI(client)
 lookup = wordnik.model.WordDefinitionsInput.WordDefinitionsInput()
 
-#DATABASE = '/tmp/flaskr.db'
 DEBUG = True
 SECRET_KEY = 'development key'
 USERNAME = 'sitong'
@@ -43,12 +44,15 @@ def score():
             try:
                 Users.add_to_word_score(session['username'], word, score)
             except ReuseError:
-                score = False
+                score = 0
                 css = "font-size:50px;"
             else:
-                css = "font-size:{0}px;".format(score)
+                css = "font-size:{0}px;".format(20)
+        grow = "grow({0},{1},{2})".format(0, max(score,20), 100)
+        #grow = "growth({0},{1})".format(0, max(score,20))
         return render_template('score.html', word=word, size=css, score=score, defn=defn,
-                               logged_in=session['logged_in'])
+                               logged_in=session['logged_in'], username=session['username'],
+                               grow=grow)
     else:
         return '"{0}" is not in our database.'.format(word)
 
@@ -103,8 +107,7 @@ def profile(username):
 def four_oh_four():
     return render_template('404.html')
 
-#if __name__ == '__main__':
-#    print 'Running Linguist on localhost:5000'
-#    app.run()
-
-app.run()
+if __name__ == '__main__':
+    print 'Running Linguist on localhost:5000'
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
