@@ -58,7 +58,7 @@ class Text(object):
         return match
 
 OWLpath = 'wordlist/TWL06.txt'
-textFolder = 'abc'
+textFolder = 'text_corpus'
 wc_dict = {}
 def main(returnTable=False):
     global wc_dict
