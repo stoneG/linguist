@@ -25,6 +25,8 @@ Users = UserTable('linguist', 'sitong', tableName='Users')
 
 @app.route('/')
 def main():
+    if 'logged_in' not in session:
+        session['logged_in'] = False
     if 'username' in session:
         return render_template('main.html', username=session['username'],
                                username_link='/'+session['username'])
@@ -32,8 +34,11 @@ def main():
 
 @app.route('/lookup', methods=['POST'])
 def score():
-    word = request.form['word']
+    word = request.form['word'].lower()
     count = WC.get_count(word)
+    score = 0
+    css = "font-size:50px;"
+    username = False
     if type(count) == type(1):
         WC.increment_word(word)
         lookup.word = word
@@ -44,21 +49,20 @@ def score():
             try:
                 Users.add_to_word_score(session['username'], word, score)
             except ReuseError:
-                score = 0
-                css = "font-size:50px;"
+                pass
             else:
                 css = "font-size:{0}px;".format(20)
+                username = session['username']
         grow = "grow({0},{1},{2})".format(0, max(score,20), 100)
-        #grow = "growth({0},{1})".format(0, max(score,20))
-        return render_template('score.html', word=word, size=css, score=score, defn=defn,
-                               logged_in=session['logged_in'], username=session['username'],
-                               grow=grow)
+        return render_template('score.html', word=word, size=css, score=score,
+                               defn=defn, logged_in=session['logged_in'],
+                               username=username, grow=grow)
     else:
         return '"{0}" is not in our database.'.format(word)
 
 @app.route('/register.html', methods=['GET', 'POST'])
 def register():
-    if session['logged_in']:
+    if 'logged_in' in session and session['logged_in']:
         return render_template('register.html', logged_in=True)
     error = ''
     if request.method == 'POST':
@@ -73,7 +77,7 @@ def register():
 
 @app.route('/login.html', methods=['GET', 'POST'])
 def login():
-    if session['logged_in']:
+    if 'logged_in' in session and session['logged_in']:
         return render_template('login.html', logged_in=True)
     error = ''
     if request.method == 'POST':

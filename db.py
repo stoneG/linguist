@@ -46,7 +46,7 @@ class Database(object):
 
 
 class WordCountTable(Database):
-    def __init__(self, dbName, dbUser, wordCount={}, tableName=None, FACTOR=280, MIN=20):
+    def __init__(self, dbName, dbUser, wordCount={}, tableName=None, FACTOR=200, MIN=25):
         Database.__init__(self, dbName, dbUser)
         self.word_count = wordCount
         if tableName:
